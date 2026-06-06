@@ -1,0 +1,476 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700&family=DM+Sans:wght@400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0f0f14;--surface:#181820;--surface2:#1e1e28;--border:#2a2a38;--accent:#7c6ff7;--accent2:#4ecdc4;--accent3:#ff6b6b;--accent4:#ffd93d;--text:#f0f0f8;--muted:#888899;--card:#1a1a24}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:2rem}
+.login-box{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2.5rem;width:100%;max-width:400px;text-align:center}
+.login-box h1{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:700;margin-bottom:.3rem}
+.login-box p{color:var(--muted);font-size:.9rem;margin-bottom:2rem}
+.field{text-align:left;margin-bottom:1.2rem}
+.field label{font-size:.8rem;color:var(--muted);display:block;margin-bottom:.4rem}
+.field input{width:100%;padding:.7rem 1rem;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:.9rem;font-family:'DM Sans',sans-serif;outline:none;transition:.2s}
+.field input:focus{border-color:var(--accent)}
+.login-btn{width:100%;padding:.85rem;background:var(--accent);color:#fff;border:none;border-radius:12px;font-size:.95rem;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.2s}
+.login-btn:hover{background:#6a5fe0}
+.login-avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin:0 auto 1.5rem}
+
+#app{display:none;min-height:100vh}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:1.5rem 1rem;flex-shrink:0}
+.logo{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:2rem;padding:.5rem}
+.logo span{color:var(--accent)}
+.nav-item{display:flex;align-items:center;gap:10px;padding:.65rem .75rem;border-radius:10px;cursor:pointer;font-size:.88rem;color:var(--muted);transition:.15s;margin-bottom:.2rem;user-select:none}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:rgba(124,111,247,.15);color:var(--accent)}
+.nav-icon{font-size:15px;width:18px;text-align:center;flex-shrink:0}
+.sidebar-bottom{margin-top:auto}
+.user-chip{display:flex;align-items:center;gap:10px;padding:.65rem .75rem;border-radius:10px;background:var(--surface2)}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:500;color:#fff;flex-shrink:0}
+.user-info{flex:1;min-width:0}
+.user-name{font-size:.82rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-role{font-size:.72rem;color:var(--muted)}
+.logout-btn{font-size:13px;cursor:pointer;color:var(--muted);padding:4px;border-radius:6px;background:none;border:none;color:var(--muted);transition:.15s}
+.logout-btn:hover{color:var(--accent3)}
+
+.main{flex:1;padding:2rem;overflow-y:auto}
+.page{display:none}
+.page.active{display:block}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem}
+.topbar h2{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:700}
+.topbar-sub{color:var(--muted);font-size:.88rem;margin-bottom:2px}
+.badge-notif{background:var(--accent);color:#fff;width:20px;height:20px;border-radius:50%;font-size:.7rem;display:flex;align-items:center;justify-content:center}
+
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.2rem 1rem;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;border-radius:4px 0 0 4px}
+.s1::before{background:var(--accent)}.s2::before{background:var(--accent2)}.s3::before{background:var(--accent3)}.s4::before{background:var(--accent4)}
+.stat-label{font-size:.75rem;color:var(--muted);margin-bottom:.4rem}
+.stat-val{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:700}
+.stat-sub{font-size:.72rem;color:var(--muted);margin-top:.2rem}
+.stat-icon{position:absolute;top:1rem;right:1rem;font-size:1.4rem;opacity:.3}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+.three-col{display:grid;grid-template-columns:2fr 1fr;gap:1rem}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.2rem}
+.card-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.card-title{font-family:'Syne',sans-serif;font-size:.92rem;font-weight:700}
+.card-action{font-size:.75rem;color:var(--accent);cursor:pointer}
+
+.task-item{display:flex;align-items:center;gap:10px;padding:.55rem 0;border-bottom:1px solid var(--border)}
+.task-item:last-child{border-bottom:none}
+.task-cb{width:16px;height:16px;border-radius:4px;border:2px solid var(--border);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:.15s}
+.task-cb.done{background:var(--accent);border-color:var(--accent)}
+.task-cb.done::after{content:'✓';color:#fff;font-size:10px}
+.task-text{flex:1;font-size:.84rem}
+.task-text.done{text-decoration:line-through;color:var(--muted)}
+.task-tag{font-size:.68rem;padding:2px 8px;border-radius:20px;font-weight:500}
+.tag-cs{background:rgba(124,111,247,.2);color:var(--accent)}
+.tag-phy{background:rgba(78,205,196,.2);color:var(--accent2)}
+.tag-math{background:rgba(255,217,61,.2);color:var(--accent4)}
+.tag-eng{background:rgba(255,107,107,.2);color:var(--accent3)}
+
+.sch-item{display:flex;gap:12px;padding:.6rem 0;border-bottom:1px solid var(--border)}
+.sch-item:last-child{border-bottom:none}
+.sch-time{font-size:.75rem;color:var(--muted);min-width:52px;padding-top:2px}
+.sch-dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.sch-info{flex:1}
+.sch-name{font-size:.84rem;font-weight:500}
+.sch-room{font-size:.73rem;color:var(--muted)}
+
+.progress-row{margin-bottom:.8rem}
+.progress-lbl{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted);margin-bottom:.3rem}
+.progress-lbl span:first-child{color:var(--text)}
+.progress-bar{height:6px;background:var(--border);border-radius:10px;overflow:hidden}
+.progress-fill{height:100%;border-radius:10px}
+
+.dl-item{display:flex;align-items:center;gap:10px;padding:.55rem 0;border-bottom:1px solid var(--border)}
+.dl-item:last-child{border-bottom:none}
+.dl-date{font-size:.7rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:2px 7px;color:var(--muted);white-space:nowrap}
+.dl-text{flex:1;font-size:.83rem}
+.pill-urgent{font-size:.68rem;padding:2px 7px;border-radius:20px;background:rgba(255,107,107,.2);color:var(--accent3)}
+.pill-ok{font-size:.68rem;padding:2px 7px;border-radius:20px;background:rgba(78,205,196,.15);color:var(--accent2)}
+
+.assign-row{display:flex;align-items:center;gap:12px;padding:.7rem 0;border-bottom:1px solid var(--border)}
+.assign-row:last-child{border-bottom:none}
+.assign-status{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.assign-info{flex:1}
+.assign-title{font-size:.85rem;font-weight:500}
+.assign-sub{font-size:.74rem;color:var(--muted)}
+.assign-due{font-size:.75rem;color:var(--muted);white-space:nowrap}
+
+.subj-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.2rem;margin-bottom:.8rem}
+.subj-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem}
+.subj-name{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700}
+.subj-grade{font-size:.8rem;font-weight:500;padding:3px 10px;border-radius:20px}
+
+.timer-wrap{text-align:center;padding:2rem 0}
+.timer-circle{width:180px;height:180px;border-radius:50%;border:3px solid var(--accent);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 1.5rem;background:var(--surface2)}
+.timer-num{font-family:'Syne',sans-serif;font-size:2.8rem;font-weight:700}
+.timer-lbl{font-size:.75rem;color:var(--muted)}
+.timer-btns{display:flex;gap:12px;justify-content:center}
+.tbtn{padding:.6rem 1.5rem;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:.85rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.15s}
+.tbtn:hover{border-color:var(--accent);color:var(--accent)}
+.tbtn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.tbtn.primary:hover{background:#6a5fe0}
+
+.analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+.bar-chart{display:flex;align-items:flex-end;gap:8px;height:100px;padding:0 .5rem}
+.bar{flex:1;border-radius:4px 4px 0 0;min-width:12px;transition:.3s}
+.bar-labels{display:flex;gap:8px;padding:4px .5rem 0;font-size:.68rem;color:var(--muted)}
+.bar-lbl{flex:1;text-align:center}
+
+.settings-section{margin-bottom:1.5rem}
+.settings-section h3{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;color:var(--muted);margin-bottom:.8rem;text-transform:uppercase;letter-spacing:.05em}
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:.7rem 0;border-bottom:1px solid var(--border)}
+.setting-row:last-child{border-bottom:none}
+.setting-lbl{font-size:.85rem}
+.setting-sub{font-size:.75rem;color:var(--muted)}
+.toggle{width:38px;height:20px;border-radius:10px;background:var(--border);position:relative;cursor:pointer;transition:.2s;flex-shrink:0}
+.toggle.on{background:var(--accent)}
+.toggle::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.2s}
+.toggle.on::after{left:20px}
+</style>
+
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-avatar">🎓</div>
+    <h1>Study<span style="color:var(--accent)">Hub</span></h1>
+    <p>Smart planner for students</p>
+    <div class="field"><label>Email or Student ID</label><input type="text" value="alex@studyhub.edu"/></div>
+    <div class="field"><label>Password</label><input type="password" value="password"/></div>
+    <button class="login-btn" onclick="doLogin()">Sign in to dashboard</button>
+  </div>
+</div>
+
+<div id="app">
+  <div class="layout">
+    <div class="sidebar">
+      <div class="logo">Study<span>Hub</span> ✦</div>
+      <div class="nav-item active" data-page="dashboard"><span class="nav-icon">⊞</span> Dashboard</div>
+      <div class="nav-item" data-page="assignments"><span class="nav-icon">📋</span> Assignments</div>
+      <div class="nav-item" data-page="schedule"><span class="nav-icon">📅</span> Schedule</div>
+      <div class="nav-item" data-page="subjects"><span class="nav-icon">📚</span> Subjects</div>
+      <div class="nav-item" data-page="timer"><span class="nav-icon">⏱</span> Focus Timer</div>
+      <div class="nav-item" data-page="analytics"><span class="nav-icon">📊</span> Analytics</div>
+      <div class="nav-item" data-page="settings"><span class="nav-icon">⚙</span> Settings</div>
+      <div class="sidebar-bottom">
+        <div class="user-chip">
+          <div class="user-avatar">AS</div>
+          <div class="user-info"><div class="user-name">Alex Smith</div><div class="user-role">Year 3 · CS</div></div>
+          <button class="logout-btn" onclick="doLogout()" title="Logout">⏏</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="main">
+
+      <div class="page active" id="page-dashboard">
+        <div class="topbar"><div><div class="topbar-sub">Monday, March 16 · Good morning 👋</div><h2>Dashboard</h2></div><div style="display:flex;align-items:center;gap:12px"><div style="position:relative;cursor:pointer"><span style="font-size:1.2rem">🔔</span><span class="badge-notif" style="position:absolute;top:-4px;right:-4px">3</span></div><div class="user-avatar" style="width:36px;height:36px;font-size:.8rem">AS</div></div></div>
+        <div class="stats-row">
+          <div class="stat-card s1"><div class="stat-label">Tasks due today</div><div class="stat-val">4</div><div class="stat-sub">2 completed</div><span class="stat-icon">✅</span></div>
+          <div class="stat-card s2"><div class="stat-label">Study streak</div><div class="stat-val">12<span style="font-size:.9rem">d</span></div><div class="stat-sub">Personal best!</div><span class="stat-icon">🔥</span></div>
+          <div class="stat-card s3"><div class="stat-label">Hours this week</div><div class="stat-val">18.5</div><div class="stat-sub">+2.5 vs last week</div><span class="stat-icon">⏱</span></div>
+          <div class="stat-card s4"><div class="stat-label">Current GPA</div><div class="stat-val">3.7</div><div class="stat-sub">Top 15% class</div><span class="stat-icon">🏅</span></div>
+        </div>
+        <div class="two-col">
+          <div class="card">
+            <div class="card-hd"><span class="card-title">Today's tasks</span><span class="card-action">+ Add task</span></div>
+            <div class="task-item"><div class="task-cb done" onclick="toggleCb(this)"></div><span class="task-text done">Read Chapter 7 — Algorithms</span><span class="task-tag tag-cs">CS</span></div>
+            <div class="task-item"><div class="task-cb done" onclick="toggleCb(this)"></div><span class="task-text done">Submit lab report draft</span><span class="task-tag tag-phy">Physics</span></div>
+            <div class="task-item"><div class="task-cb" onclick="toggleCb(this)"></div><span class="task-text">Practice problems — Linear Algebra</span><span class="task-tag tag-math">Math</span></div>
+            <div class="task-item"><div class="task-cb" onclick="toggleCb(this)"></div><span class="task-text">Essay outline — Ethics in AI</span><span class="task-tag tag-eng">Eng</span></div>
+            <div class="task-item"><div class="task-cb" onclick="toggleCb(this)"></div><span class="task-text">Review slides for tomorrow's exam</span><span class="task-tag tag-math">Math</span></div>
+          </div>
+          <div class="card">
+            <div class="card-hd"><span class="card-title">Today's schedule</span><span class="card-action" onclick="navigate('schedule')">View full</span></div>
+            <div class="sch-item"><span class="sch-time">9:00 AM</span><div class="sch-dot" style="background:var(--accent)"></div><div class="sch-info"><div class="sch-name">Algorithms Lecture</div><div class="sch-room">Room B-204 · Prof. Chen</div></div></div>
+            <div class="sch-item"><span class="sch-time">11:00 AM</span><div class="sch-dot" style="background:var(--accent2)"></div><div class="sch-info"><div class="sch-name">Physics Lab</div><div class="sch-room">Lab 3A · Dr. Patel</div></div></div>
+            <div class="sch-item"><span class="sch-time">2:00 PM</span><div class="sch-dot" style="background:var(--accent4)"></div><div class="sch-info"><div class="sch-name">Study Group — Math</div><div class="sch-room">Library Pod 6</div></div></div>
+            <div class="sch-item"><span class="sch-time">4:30 PM</span><div class="sch-dot" style="background:var(--accent3)"></div><div class="sch-info"><div class="sch-name">Office Hours — Dr. Liu</div><div class="sch-room">CS Dept. 112</div></div></div>
+          </div>
+        </div>
+        <div class="three-col">
+          <div class="card">
+            <div class="card-hd"><span class="card-title">Upcoming deadlines</span><span class="card-action" onclick="navigate('assignments')">View all</span></div>
+            <div class="dl-item"><span class="dl-date">Mar 17</span><span class="dl-text">Physics Lab Report Final</span><span class="pill-urgent">Tomorrow</span></div>
+            <div class="dl-item"><span class="dl-date">Mar 19</span><span class="dl-text">CS Assignment 3 — Sorting Algorithms</span><span class="pill-urgent">3 days</span></div>
+            <div class="dl-item"><span class="dl-date">Mar 22</span><span class="dl-text">Ethics in AI Essay — 2000 words</span><span class="pill-ok">6 days</span></div>
+            <div class="dl-item"><span class="dl-date">Mar 28</span><span class="dl-text">Linear Algebra Midterm Exam</span><span class="pill-ok">12 days</span></div>
+          </div>
+          <div class="card">
+            <div class="card-hd"><span class="card-title">Subject progress</span></div>
+            <div class="progress-row"><div class="progress-lbl"><span>Computer Science</span><span>82%</span></div><div class="progress-bar"><div class="progress-fill" style="width:82%;background:var(--accent)"></div></div></div>
+            <div class="progress-row"><div class="progress-lbl"><span>Physics</span><span>74%</span></div><div class="progress-bar"><div class="progress-fill" style="width:74%;background:var(--accent2)"></div></div></div>
+            <div class="progress-row"><div class="progress-lbl"><span>Mathematics</span><span>68%</span></div><div class="progress-bar"><div class="progress-fill" style="width:68%;background:var(--accent4)"></div></div></div>
+            <div class="progress-row"><div class="progress-lbl"><span>English</span><span>91%</span></div><div class="progress-bar"><div class="progress-fill" style="width:91%;background:var(--accent3)"></div></div></div>
+            <div style="text-align:center;padding:.8rem 0 .3rem"><div style="font-size:.75rem;color:var(--muted);margin-bottom:.2rem">Current GPA</div><div style="font-family:'Syne',sans-serif;font-size:2rem;font-weight:700">3.7</div><div style="font-size:.72rem;color:var(--accent2)">↑ 0.2 from last semester</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page" id="page-assignments">
+        <div class="topbar"><div><div class="topbar-sub">Track your work</div><h2>Assignments</h2></div><span class="card-action" style="font-size:.85rem;padding:.5rem 1rem;border:1px solid var(--accent);border-radius:8px;cursor:pointer">+ New assignment</span></div>
+        <div class="card" style="margin-bottom:1rem">
+          <div class="card-hd"><span class="card-title">Overdue</span><span style="font-size:.72rem;padding:2px 8px;border-radius:20px;background:rgba(255,107,107,.2);color:var(--accent3)">1 item</span></div>
+          <div class="assign-row"><div class="assign-status" style="background:var(--accent3)"></div><div class="assign-info"><div class="assign-title">History Essay — Industrial Revolution</div><div class="assign-sub">History · 1500 words</div></div><span class="assign-due" style="color:var(--accent3)">Mar 14 · Overdue</span></div>
+        </div>
+        <div class="card" style="margin-bottom:1rem">
+          <div class="card-hd"><span class="card-title">Due this week</span><span style="font-size:.72rem;padding:2px 8px;border-radius:20px;background:rgba(255,217,61,.2);color:var(--accent4)">3 items</span></div>
+          <div class="assign-row"><div class="assign-status" style="background:var(--accent3)"></div><div class="assign-info"><div class="assign-title">Physics Lab Report Final</div><div class="assign-sub">Physics · Lab writeup</div></div><span class="assign-due">Mar 17</span></div>
+          <div class="assign-row"><div class="assign-status" style="background:var(--accent4)"></div><div class="assign-info"><div class="assign-title">CS Assignment 3 — Sorting Algorithms</div><div class="assign-sub">Computer Science · Coding</div></div><span class="assign-due">Mar 19</span></div>
+          <div class="assign-row"><div class="assign-status" style="background:var(--accent4)"></div><div class="assign-info"><div class="assign-title">Linear Algebra Problem Set 5</div><div class="assign-sub">Mathematics · 12 problems</div></div><span class="assign-due">Mar 20</span></div>
+        </div>
+        <div class="card" style="margin-bottom:1rem">
+          <div class="card-hd"><span class="card-title">Upcoming</span><span class="pill-ok">2 items</span></div>
+          <div class="assign-row"><div class="assign-status" style="background:var(--accent2)"></div><div class="assign-info"><div class="assign-title">Ethics in AI Essay — 2000 words</div><div class="assign-sub">English · Essay</div></div><span class="assign-due">Mar 22</span></div>
+          <div class="assign-row"><div class="assign-status" style="background:var(--accent2)"></div><div class="assign-info"><div class="assign-title">Linear Algebra Midterm Exam</div><div class="assign-sub">Mathematics · Exam</div></div><span class="assign-due">Mar 28</span></div>
+        </div>
+        <div class="card">
+          <div class="card-hd"><span class="card-title">Completed</span><span class="pill-ok">4 items</span></div>
+          <div class="assign-row"><div class="assign-status" style="background:#444"></div><div class="assign-info"><div class="assign-title" style="text-decoration:line-through;color:var(--muted)">Physics Lab Report Draft</div><div class="assign-sub">Physics</div></div><span class="assign-due" style="color:var(--muted)">Mar 13 ✓</span></div>
+          <div class="assign-row"><div class="assign-status" style="background:#444"></div><div class="assign-info"><div class="assign-title" style="text-decoration:line-through;color:var(--muted)">CS Assignment 2</div><div class="assign-sub">Computer Science</div></div><span class="assign-due" style="color:var(--muted)">Mar 10 ✓</span></div>
+        </div>
+      </div>
+
+      <div class="page" id="page-schedule">
+        <div class="topbar"><div><div class="topbar-sub">Week of March 16, 2026</div><h2>Schedule</h2></div><div style="display:flex;gap:8px"><span class="tbtn" style="padding:.4rem .9rem;font-size:.8rem">◀ Prev</span><span class="tbtn" style="padding:.4rem .9rem;font-size:.8rem">Next ▶</span></div></div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:.8rem;margin-bottom:1rem">
+          <div style="text-align:center;font-size:.75rem;color:var(--muted);font-weight:500;padding:.4rem 0">MON 16</div>
+          <div style="text-align:center;font-size:.75rem;color:var(--muted);font-weight:500;padding:.4rem 0">TUE 17</div>
+          <div style="text-align:center;font-size:.75rem;color:var(--muted);font-weight:500;padding:.4rem 0">WED 18</div>
+          <div style="text-align:center;font-size:.75rem;color:var(--muted);font-weight:500;padding:.4rem 0">THU 19</div>
+          <div style="text-align:center;font-size:.75rem;color:var(--muted);font-weight:500;padding:.4rem 0">FRI 20</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:.8rem">
+          <div>
+            <div style="background:rgba(124,111,247,.15);border:1px solid rgba(124,111,247,.3);border-radius:10px;padding:.6rem .7rem;margin-bottom:.5rem"><div style="font-size:.78rem;font-weight:500;color:var(--accent)">9:00 AM</div><div style="font-size:.8rem">Algorithms</div><div style="font-size:.7rem;color:var(--muted)">Room B-204</div></div>
+            <div style="background:rgba(78,205,196,.1);border:1px solid rgba(78,205,196,.25);border-radius:10px;padding:.6rem .7rem;margin-bottom:.5rem"><div style="font-size:.78rem;font-weight:500;color:var(--accent2)">11:00 AM</div><div style="font-size:.8rem">Physics Lab</div><div style="font-size:.7rem;color:var(--muted)">Lab 3A</div></div>
+            <div style="background:rgba(255,217,61,.1);border:1px solid rgba(255,217,61,.2);border-radius:10px;padding:.6rem .7rem"><div style="font-size:.78rem;font-weight:500;color:var(--accent4)">2:00 PM</div><div style="font-size:.8rem">Study Group</div><div style="font-size:.7rem;color:var(--muted)">Library</div></div>
+          </div>
+          <div>
+            <div style="background:rgba(124,111,247,.15);border:1px solid rgba(124,111,247,.3);border-radius:10px;padding:.6rem .7rem;margin-bottom:.5rem"><div style="font-size:.78rem;font-weight:500;color:var(--accent)">10:00 AM</div><div style="font-size:.8rem">Linear Algebra</div><div style="font-size:.7rem;color:var(--muted)">Room A-101</div></div>
+            <div style="background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.2);border-radius:10px;padding:.6rem .7rem"><div style="font-size:.78rem;font-weight:500;color:var(--accent3)">3:00 PM</div><div style="font-size:.8rem">English Seminar</div><div style="font-size:.7rem;color:var(--muted)">Room C-12</div></div>
+          </div>
+          <div>
+            <div style="background:rgba(78,205,196,.1);border:1px solid rgba(78,205,196,.25);border-radius:10px;padding:.6rem .7rem;margin-bottom:.5rem"><div style="font-size:.78rem;font-weight:500;color:var(--accent2)">9:00 AM</div><div style="font-size:.8rem">Physics Lecture</div><div style="font-size:.7rem;color:var(--muted)">Hall D</div></div>
+            <div style="background:rgba(124,111,247,.15);border:1px solid rgba(124,111,247,.3);border-radius:10px;padding:.6rem .7rem"><div style="font-size:.78rem;font-weight:500;color:var(--accent)">1:00 PM</div><div style="font-size:.8rem">CS Tutorial</div><div style="font-size:.7rem;color:var(--muted)">Lab 2B</div></div>
+          </div>
+          <div>
+            <div style="background:rgba(255,217,61,.1);border:1px solid rgba(255,217,61,.2);border-radius:10px;padding:.6rem .7rem;margin-bottom:.5rem"><div style="font-size:.78rem;font-weight:500;color:var(--accent4)">11:00 AM</div><div style="font-size:.8rem">Math Problem Class</div><div style="font-size:.7rem;color:var(--muted)">Room A-103</div></div>
+            <div style="background:rgba(78,205,196,.1);border:1px solid rgba(78,205,196,.25);border-radius:10px;padding:.6rem .7rem"><div style="font-size:.78rem;font-weight:500;color:var(--accent2)">4:00 PM</div><div style="font-size:.8rem">Lab Practical</div><div style="font-size:.7rem;color:var(--muted)">Lab 3A</div></div>
+          </div>
+          <div>
+            <div style="background:rgba(124,111,247,.15);border:1px solid rgba(124,111,247,.3);border-radius:10px;padding:.6rem .7rem;margin-bottom:.5rem"><div style="font-size:.78rem;font-weight:500;color:var(--accent)">10:00 AM</div><div style="font-size:.8rem">Algorithms Review</div><div style="font-size:.7rem;color:var(--muted)">Room B-204</div></div>
+            <div style="background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.2);border-radius:10px;padding:.6rem .7rem"><div style="font-size:.78rem;font-weight:500;color:var(--accent3)">2:00 PM</div><div style="font-size:.8rem">Free Study</div><div style="font-size:.7rem;color:var(--muted)">Library</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page" id="page-subjects">
+        <div class="topbar"><div><div class="topbar-sub">Academic progress</div><h2>Subjects</h2></div></div>
+        <div class="subj-card"><div class="subj-hd"><span class="subj-name">Computer Science</span><span class="subj-grade" style="background:rgba(124,111,247,.2);color:var(--accent)">A · 82%</span></div><div class="progress-bar" style="margin-bottom:.6rem"><div class="progress-fill" style="width:82%;background:var(--accent)"></div></div><div style="display:flex;gap:1rem;font-size:.78rem;color:var(--muted)"><span>Prof. Chen</span><span>·</span><span>4 assignments</span><span>·</span><span>Next: Mar 19</span></div></div>
+        <div class="subj-card"><div class="subj-hd"><span class="subj-name">Physics</span><span class="subj-grade" style="background:rgba(78,205,196,.15);color:var(--accent2)">B+ · 74%</span></div><div class="progress-bar" style="margin-bottom:.6rem"><div class="progress-fill" style="width:74%;background:var(--accent2)"></div></div><div style="display:flex;gap:1rem;font-size:.78rem;color:var(--muted)"><span>Dr. Patel</span><span>·</span><span>3 assignments</span><span>·</span><span>Next: Mar 17</span></div></div>
+        <div class="subj-card"><div class="subj-hd"><span class="subj-name">Mathematics</span><span class="subj-grade" style="background:rgba(255,217,61,.15);color:var(--accent4)">B · 68%</span></div><div class="progress-bar" style="margin-bottom:.6rem"><div class="progress-fill" style="width:68%;background:var(--accent4)"></div></div><div style="display:flex;gap:1rem;font-size:.78rem;color:var(--muted)"><span>Dr. Liu</span><span>·</span><span>5 assignments</span><span>·</span><span>Exam: Mar 28</span></div></div>
+        <div class="subj-card"><div class="subj-hd"><span class="subj-name">English</span><span class="subj-grade" style="background:rgba(255,107,107,.15);color:var(--accent3)">A+ · 91%</span></div><div class="progress-bar" style="margin-bottom:.6rem"><div class="progress-fill" style="width:91%;background:var(--accent3)"></div></div><div style="display:flex;gap:1rem;font-size:.78rem;color:var(--muted)"><span>Prof. Williams</span><span>·</span><span>2 assignments</span><span>·</span><span>Next: Mar 22</span></div></div>
+        <div class="subj-card"><div class="subj-hd"><span class="subj-name">History</span><span class="subj-grade" style="background:rgba(136,135,128,.2);color:var(--muted)">C+ · 58%</span></div><div class="progress-bar" style="margin-bottom:.6rem"><div class="progress-fill" style="width:58%;background:#888799)"></div></div><div style="display:flex;gap:1rem;font-size:.78rem;color:var(--muted)"><span>Dr. Moore</span><span>·</span><span>2 assignments</span><span>·</span><span>Overdue essay!</span></div></div>
+      </div>
+
+      <div class="page" id="page-timer">
+        <div class="topbar"><div><div class="topbar-sub">Stay focused</div><h2>Focus Timer</h2></div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;max-width:600px">
+          <div class="card" style="text-align:center">
+            <div class="card-hd" style="justify-content:center"><span class="card-title">Pomodoro Timer</span></div>
+            <div class="timer-circle" id="timer-circle">
+              <div class="timer-num" id="timer-display">25:00</div>
+              <div class="timer-lbl" id="timer-mode-lbl">Focus session</div>
+            </div>
+            <div class="timer-btns">
+              <button class="tbtn primary" id="timer-start-btn" onclick="timerToggle()">Start</button>
+              <button class="tbtn" onclick="timerReset()">Reset</button>
+            </div>
+            <div style="margin-top:1rem;font-size:.78rem;color:var(--muted)">Session <span id="session-count">1</span> of 4</div>
+          </div>
+          <div class="card">
+            <div class="card-hd"><span class="card-title">Session log</span></div>
+            <div id="session-log">
+              <div style="font-size:.82rem;color:var(--muted);text-align:center;padding:1rem 0">No sessions yet today</div>
+            </div>
+            <div style="border-top:1px solid var(--border);padding-top:.8rem;margin-top:.5rem">
+              <div class="progress-lbl"><span style="font-size:.78rem">Daily goal (4 sessions)</span><span id="daily-prog">0/4</span></div>
+              <div class="progress-bar"><div class="progress-fill" id="daily-bar" style="width:0%;background:var(--accent)"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="max-width:600px;margin-top:1rem">
+          <div class="card-hd"><span class="card-title">Timer settings</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem">
+            <div><div style="font-size:.78rem;color:var(--muted);margin-bottom:.4rem">Focus (min)</div><input type="number" value="25" min="1" max="60" id="focus-mins" style="width:100%;padding:.4rem .6rem;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.85rem"/></div>
+            <div><div style="font-size:.78rem;color:var(--muted);margin-bottom:.4rem">Short break</div><input type="number" value="5" min="1" max="30" id="break-mins" style="width:100%;padding:.4rem .6rem;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.85rem"/></div>
+            <div><div style="font-size:.78rem;color:var(--muted);margin-bottom:.4rem">Long break</div><input type="number" value="15" min="1" max="60" id="long-break-mins" style="width:100%;padding:.4rem .6rem;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.85rem"/></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page" id="page-analytics">
+        <div class="topbar"><div><div class="topbar-sub">Your performance</div><h2>Analytics</h2></div></div>
+        <div class="stats-row">
+          <div class="stat-card s1"><div class="stat-label">Total study hours</div><div class="stat-val">142</div><div class="stat-sub">This semester</div></div>
+          <div class="stat-card s2"><div class="stat-label">Tasks completed</div><div class="stat-val">47</div><div class="stat-sub">89% completion rate</div></div>
+          <div class="stat-card s3"><div class="stat-label">Avg daily hours</div><div class="stat-val">3.2</div><div class="stat-sub">Goal: 4 hrs</div></div>
+          <div class="stat-card s4"><div class="stat-label">Best subject</div><div class="stat-val" style="font-size:1rem;padding-top:.3rem">English</div><div class="stat-sub">91% score</div></div>
+        </div>
+        <div class="two-col">
+          <div class="card">
+            <div class="card-hd"><span class="card-title">Weekly study hours</span></div>
+            <div class="bar-chart">
+              <div class="bar" style="height:60%;background:var(--accent);opacity:.6"></div>
+              <div class="bar" style="height:80%;background:var(--accent);opacity:.7"></div>
+              <div class="bar" style="height:45%;background:var(--accent);opacity:.6"></div>
+              <div class="bar" style="height:90%;background:var(--accent);opacity:.8"></div>
+              <div class="bar" style="height:70%;background:var(--accent)"></div>
+              <div class="bar" style="height:55%;background:var(--accent);opacity:.6"></div>
+              <div class="bar" style="height:75%;background:var(--accent);opacity:.7"></div>
+            </div>
+            <div class="bar-labels">
+              <span class="bar-lbl">Mon</span><span class="bar-lbl">Tue</span><span class="bar-lbl">Wed</span><span class="bar-lbl">Thu</span><span class="bar-lbl">Fri</span><span class="bar-lbl">Sat</span><span class="bar-lbl">Sun</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-hd"><span class="card-title">Subject breakdown</span></div>
+            <div class="progress-row" style="margin-top:.5rem"><div class="progress-lbl"><span>CS</span><span>38%</span></div><div class="progress-bar"><div class="progress-fill" style="width:38%;background:var(--accent)"></div></div></div>
+            <div class="progress-row"><div class="progress-lbl"><span>Math</span><span>27%</span></div><div class="progress-bar"><div class="progress-fill" style="width:27%;background:var(--accent4)"></div></div></div>
+            <div class="progress-row"><div class="progress-lbl"><span>Physics</span><span>20%</span></div><div class="progress-bar"><div class="progress-fill" style="width:20%;background:var(--accent2)"></div></div></div>
+            <div class="progress-row"><div class="progress-lbl"><span>English</span><span>15%</span></div><div class="progress-bar"><div class="progress-fill" style="width:15%;background:var(--accent3)"></div></div></div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:1rem">
+          <div class="card-hd"><span class="card-title">Grade trend (last 6 weeks)</span></div>
+          <div style="display:flex;align-items:flex-end;gap:1rem;height:80px;padding:0 .5rem">
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><div style="flex:1;display:flex;align-items:flex-end;width:100%"><div style="width:100%;background:var(--accent);border-radius:4px 4px 0 0;height:60%"></div></div><span style="font-size:.68rem;color:var(--muted)">W1</span></div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><div style="flex:1;display:flex;align-items:flex-end;width:100%"><div style="width:100%;background:var(--accent);border-radius:4px 4px 0 0;height:65%"></div></div><span style="font-size:.68rem;color:var(--muted)">W2</span></div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><div style="flex:1;display:flex;align-items:flex-end;width:100%"><div style="width:100%;background:var(--accent);border-radius:4px 4px 0 0;height:70%"></div></div><span style="font-size:.68rem;color:var(--muted)">W3</span></div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><div style="flex:1;display:flex;align-items:flex-end;width:100%"><div style="width:100%;background:var(--accent);border-radius:4px 4px 0 0;height:75%"></div></div><span style="font-size:.68rem;color:var(--muted)">W4</span></div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><div style="flex:1;display:flex;align-items:flex-end;width:100%"><div style="width:100%;background:var(--accent);border-radius:4px 4px 0 0;height:80%"></div></div><span style="font-size:.68rem;color:var(--muted)">W5</span></div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><div style="flex:1;display:flex;align-items:flex-end;width:100%"><div style="width:100%;background:var(--accent2);border-radius:4px 4px 0 0;height:88%"></div></div><span style="font-size:.68rem;color:var(--muted)">W6</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page" id="page-settings">
+        <div class="topbar"><div><div class="topbar-sub">Preferences</div><h2>Settings</h2></div></div>
+        <div class="card" style="max-width:600px">
+          <div class="settings-section">
+            <h3>Profile</h3>
+            <div class="setting-row"><div><div class="setting-lbl">Name</div><div class="setting-sub">Alex Smith</div></div><span class="card-action">Edit</span></div>
+            <div class="setting-row"><div><div class="setting-lbl">Student ID</div><div class="setting-sub">CS2024-0342</div></div><span class="card-action">Edit</span></div>
+            <div class="setting-row"><div><div class="setting-lbl">Year & Programme</div><div class="setting-sub">Year 3 · Computer Science</div></div><span class="card-action">Edit</span></div>
+          </div>
+          <div class="settings-section">
+            <h3>Notifications</h3>
+            <div class="setting-row"><div><div class="setting-lbl">Assignment reminders</div><div class="setting-sub">24 hours before deadline</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="setting-row"><div><div class="setting-lbl">Study streak alerts</div><div class="setting-sub">Daily at 8:00 PM</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="setting-row"><div><div class="setting-lbl">Class reminders</div><div class="setting-sub">15 minutes before class</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+          </div>
+          <div class="settings-section">
+            <h3>Appearance</h3>
+            <div class="setting-row"><div><div class="setting-lbl">Dark mode</div><div class="setting-sub">Currently active</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="setting-row"><div><div class="setting-lbl">Compact view</div><div class="setting-sub">Reduce spacing</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+          </div>
+          <div class="settings-section">
+            <h3>Account</h3>
+            <div class="setting-row"><div><div class="setting-lbl" style="color:var(--accent3)">Sign out</div></div><button class="tbtn" style="padding:.35rem .9rem;font-size:.8rem;border-color:var(--accent3);color:var(--accent3)" onclick="doLogout()">Logout</button></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+function doLogin(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='block';
+}
+function doLogout(){
+  document.getElementById('app').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+}
+function navigate(pageId){
+  document.querySelectorAll('.nav-item').forEach(n=>{
+    n.classList.toggle('active', n.dataset.page===pageId);
+  });
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const target=document.getElementById('page-'+pageId);
+  if(target) target.classList.add('active');
+}
+document.querySelectorAll('.nav-item').forEach(n=>{
+  n.addEventListener('click',()=>navigate(n.dataset.page));
+});
+function toggleCb(cb){
+  cb.classList.toggle('done');
+  cb.nextElementSibling.classList.toggle('done');
+}
+
+let timerInterval=null, timerRunning=false, timerSeconds=25*60, isBreak=false, sessionsCompleted=0;
+function timerToggle(){
+  if(timerRunning){
+    clearInterval(timerInterval);timerRunning=false;
+    document.getElementById('timer-start-btn').textContent='Resume';
+  } else {
+    timerRunning=true;
+    document.getElementById('timer-start-btn').textContent='Pause';
+    timerInterval=setInterval(()=>{
+      timerSeconds--;
+      if(timerSeconds<=0){
+        clearInterval(timerInterval);timerRunning=false;
+        if(!isBreak){
+          sessionsCompleted++;
+          addSessionLog();
+          updateDailyProgress();
+          isBreak=true;
+          timerSeconds=5*60;
+          document.getElementById('timer-mode-lbl').textContent='Break time';
+          document.getElementById('timer-circle').style.borderColor='var(--accent2)';
+        } else {
+          isBreak=false;
+          timerSeconds=25*60;
+          document.getElementById('timer-mode-lbl').textContent='Focus session';
+          document.getElementById('timer-circle').style.borderColor='var(--accent)';
+        }
+        document.getElementById('timer-start-btn').textContent='Start';
+      }
+      const m=Math.floor(timerSeconds/60), s=timerSeconds%60;
+      document.getElementById('timer-display').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+    },1000);
+  }
+}
+function timerReset(){
+  clearInterval(timerInterval);timerRunning=false;isBreak=false;
+  timerSeconds=parseInt(document.getElementById('focus-mins').value||25)*60;
+  const m=Math.floor(timerSeconds/60),s=timerSeconds%60;
+  document.getElementById('timer-display').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  document.getElementById('timer-mode-lbl').textContent='Focus session';
+  document.getElementById('timer-start-btn').textContent='Start';
+  document.getElementById('timer-circle').style.borderColor='var(--accent)';
+}
+function addSessionLog(){
+  const log=document.getElementById('session-log');
+  if(sessionsCompleted===1) log.innerHTML='';
+  const now=new Date(),h=now.getHours(),m=now.getMinutes();
+  const t=(h%12||12)+':'+(String(m).padStart(2,'0'))+(h<12?' AM':' PM');
+  const el=document.createElement('div');
+  el.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:.4rem 0;border-bottom:1px solid var(--border);font-size:.8rem';
+  el.innerHTML='<span>Session '+sessionsCompleted+'</span><span style="color:var(--muted)">'+t+' · 25 min</span>';
+  log.appendChild(el);
+  document.getElementById('session-count').textContent=sessionsCompleted+1;
+}
+function updateDailyProgress(){
+  const pct=Math.min(sessionsCompleted/4*100,100);
+  document.getElementById('daily-bar').style.width=pct+'%';
+  document.getElementById('daily-prog').textContent=Math.min(sessionsCompleted,4)+'/4';
+}
+</script>
