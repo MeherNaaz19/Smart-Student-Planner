@@ -39,7 +39,7 @@ Smart-Student-Planner/
 
 ## ▶️ How to Run
 
-Open `index.html` in any browser — no setup required.
+Open `index.html` in any browser (no setup required)
 
 Or visit the live link above.
 
